@@ -5,10 +5,7 @@ export interface Player {
 	name: string;
 }
 
-export interface Character {
-	id: number;
-	name: string;
-}
+export type Character = string;
 
 export interface Champion {
 	player: Player;
@@ -22,17 +19,26 @@ export interface Round {
 }
 
 export interface Game {
-	p1: {
-		player: Player;
-		character: Character;
-	};
-	p2: {
-		player: Player;
-		character: Character;
-	};
-	winner: Player;
-	rounds: Round[];
+	p1: string;
+	c1: Character;
+	p2: string;
+	c2: Character;
+	winner: "p1" | "p2";
 }
+
+// export interface Game {
+// 	p1: {
+// 		player: Player;
+// 		character: Character;
+// 	};
+// 	c1: Character;
+// 	p2: {
+// 		player: Player;
+// 		character: Character;
+// 	};
+// 	winner: Player;
+// 	rounds: Round[];
+// }
 
 /**
  * Each player has 3 lives. Player to lose all lives loses. Each life is 100 hp.
@@ -58,13 +64,21 @@ class Match {
 			rounds.push(r);
 		}
 
-		const winner = lives.p1 > 0 ? this.p1 : this.p2;
+		const winner = lives.p1 > 0 ? "p1" : "p2";
 		return {
-			winner: winner.player,
-			p1: { character: this.p1.character, player: this.p1.player },
-			p2: { character: this.p2.character, player: this.p2.player },
-			rounds,
+			c1: this.p1.character,
+			c2: this.p2.character,
+			p1: this.p1.player.name,
+			p2: this.p2.player.name,
+			winner,
 		};
+
+		// return {
+		// 	winner: winner.player,
+		// 	p1: { character: this.p1.character, player: this.p1.player },
+		// 	p2: { character: this.p2.character, player: this.p2.player },
+		// 	rounds,
+		// };
 	}
 
 	private attack(player: Champion) {

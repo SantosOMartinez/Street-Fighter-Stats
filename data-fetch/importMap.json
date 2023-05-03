@@ -1,5 +1,6 @@
 {
 	"imports": {
-		"faker": "https://cdn.skypack.dev/@faker-js/faker@v7.6.0?dts"
+		"faker": "https://cdn.skypack.dev/@faker-js/faker@v7.6.0?dts",
+		"deno-csv": "https://deno.land/x/csv@v0.8.0/mod.ts"
 	}
 }

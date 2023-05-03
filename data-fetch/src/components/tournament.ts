@@ -1,14 +1,19 @@
 import { faker } from "faker";
 
+import roster from "../../rosterList.ts";
 import Match, { Champion, Character, Game, Player } from "./match.ts";
+import { RosterWinRate } from "./roster.ts";
 
 class Tournament {
 	private players: Player[];
 	private matches: number;
 
+	private roster: RosterWinRate = {};
+
 	constructor(players: number, matches: number) {
 		this.players = this.generatePlayers(players);
 		this.matches = matches;
+		this.roster = roster;
 	}
 
 	play() {
@@ -31,7 +36,7 @@ class Tournament {
 	}
 
 	private runMatches(player: Player) {
-		const opponents = this.players.filter((p) => p.id !== player.id);
+		const opponents = this.players.filter((p) => p !== player);
 		const n = opponents.length;
 
 		const matches: Game[] = [];
@@ -41,19 +46,21 @@ class Tournament {
 			const opponent = opponents[index];
 
 			// TODO: Implement random character select with character database.
-			const c1: Character = { id: 0, name: "" };
-			const c2: Character = { id: 0, name: "" };
+			const c1: Character = this.randomCharacter();
+			const c2: Character = this.randomCharacter();
+
+			const winRate = this.roster[c1][c2];
 
 			const p1: Champion = {
 				character: c1,
 				player,
-				winRate: 0,
+				winRate: winRate,
 			};
 
 			const p2: Champion = {
 				character: c2,
 				player: opponent,
-				winRate: 0,
+				winRate: 1 - winRate,
 			};
 
 			const match = new Match(p1, p2);
@@ -66,6 +73,13 @@ class Tournament {
 		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+	private randomCharacter() {
+		const options = Object.keys(this.roster);
+		const n = options.length;
+		const r = this.getRandomInt(0, (n - 1).clamp(0, n));
+		return options[r];
 	}
 }
 
