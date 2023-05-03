@@ -1,25 +1,4 @@
-declare global {
-	interface Number {
-		clamp: (min: number, max: number) => number;
-	}
-}
-
-/**
- * Returns a number whose value is limited to the given range.
- *
- * Example: limit the output of this computation to between 0 and 255
- * (x * 255).clamp(0, 255)
- *
- * @param {Number} min The lower boundary of the output range
- * @param {Number} max The upper boundary of the output range
- * @returns A number in the range [min, max]
- * @type Number
- */
-Number.prototype.clamp = function (min: number, max: number): number {
-	return Math.min(Math.max(this.valueOf(), min), max);
-};
-
-const { random, abs } = Math;
+const { random, abs, round } = Math;
 
 export interface Player {
 	id: number;
@@ -37,13 +16,21 @@ export interface Champion {
 	winRate: number;
 }
 
-interface Round {
+export interface Round {
 	winner: "p1" | "p2";
 	hp: { p1: number; p2: number };
 }
 
-interface Game {
-	winner: Champion;
+export interface Game {
+	p1: {
+		player: Player;
+		character: Character;
+	};
+	p2: {
+		player: Player;
+		character: Character;
+	};
+	winner: Player;
 	rounds: Round[];
 }
 
@@ -71,9 +58,11 @@ class Match {
 			rounds.push(r);
 		}
 
-		const winner = lives.p1 > 0 ? p1 : p2;
+		const winner = lives.p1 > 0 ? this.p1 : this.p2;
 		return {
-			winner,
+			winner: winner.player,
+			p1: { character: this.p1.character, player: this.p1.player },
+			p2: { character: this.p2.character, player: this.p2.player },
 			rounds,
 		};
 	}
@@ -86,7 +75,7 @@ class Match {
 		const willCrit = random() <= player.winRate;
 		const crit = willCrit ? base / 4 : 0;
 		const damage = r * base + crit;
-		return abs(damage).clamp(min, max);
+		return abs(round(damage)).clamp(min, max);
 	}
 
 	private turn() {
@@ -115,20 +104,3 @@ class Match {
 }
 
 export default Match;
-
-const p1: Champion = {
-	character: { id: 1, name: "Kirby" },
-	player: { id: 1, name: "Santos" },
-	winRate: 0.465,
-};
-
-const p2: Champion = {
-	character: { id: 2, name: "Bowser" },
-	player: { id: 2, name: "Kevin" },
-	winRate: 0.535,
-};
-
-const match = new Match(p1, p2);
-
-const win = match.play();
-console.log(win);

@@ -11,5 +11,6 @@
 		"proseWrap": "preserve",
 		"include": ["src/"]
 	},
-	"imports": {}
+	"importMap": "importMap.json",
+	"compilerOptions": {}
 }
